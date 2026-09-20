@@ -1,6 +1,8 @@
 import { DashboardData, Skill, SkillGap, Roadmap, WeekPlan, PracticeTask, EvaluationResult, AgentLog, ProgressReport } from '../types';
 
-const API_BASE = '/api';
+const API_BASE = (import.meta as any).env?.VITE_API_BASE_URL 
+  ? `${(import.meta as any).env.VITE_API_BASE_URL.replace(/\/$/, '')}/api` 
+  : '/api';
 
 export const api = {
   async healthCheck() {

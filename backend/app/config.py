@@ -9,7 +9,11 @@ load_dotenv(BASE_DIR.parent / ".env", override=True)
 load_dotenv(BASE_DIR / ".env", override=True)
 load_dotenv(override=True)
 
-DB_PATH = os.getenv("EDUPATH_DB_PATH", str(BASE_DIR / "edupath.db"))
+is_serverless = bool(os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"))
+default_db = "/tmp/edupath.db" if is_serverless else str(BASE_DIR / "edupath.db")
+default_uploads = "/tmp/uploads" if is_serverless else str(BASE_DIR / "uploads")
+
+DB_PATH = os.getenv("EDUPATH_DB_PATH", default_db)
 
 class Settings(BaseModel):
     app_name: str = "EduPath AI"
@@ -19,7 +23,10 @@ class Settings(BaseModel):
     llm_provider: str = os.getenv("LLM_PROVIDER", "auto") # auto, gemini, groq, mock
     llm_model: str = os.getenv("LLM_MODEL", "gemini-3.6-flash")
     db_path: str = DB_PATH
-    upload_dir: str = str(BASE_DIR / "uploads")
+    upload_dir: str = default_uploads
 
 settings = Settings()
-os.makedirs(settings.upload_dir, exist_ok=True)
+try:
+    os.makedirs(settings.upload_dir, exist_ok=True)
+except Exception:
+    pass

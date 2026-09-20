@@ -40,6 +40,13 @@ def on_startup():
     init_db()
     seed_demo_data(force_reset=False)
 
+# Eager DB initialization for serverless runtimes where startup events might not fire
+try:
+    init_db()
+    seed_demo_data(force_reset=False)
+except Exception:
+    pass
+
 @app.get("/api/health")
 def health_check():
     return {
